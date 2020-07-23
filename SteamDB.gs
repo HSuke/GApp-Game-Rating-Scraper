@@ -59,8 +59,8 @@ function update_SteamDB_Scores(force_try, check_price) {
   }
   catch (e) {
     var err_msg = function_name + " - Couldn't open \"" + sheet.getName() + "\" sheet: " + e;
-    Logger.log(err_msg);
-    Browser.msgBox(err_msg);
+    console.error(err_msg);
+    SpreadsheetApp.getUi().showModelessDialog(HtmlService.createHtmlOutput(err_msg), "Script error");
     
     return 0;
   }
@@ -95,13 +95,14 @@ function update_SteamDB_Scores(force_try, check_price) {
     });
   }
   catch(e) {
-    Logger.log(e);
-    Browser.msgBox(e);
+    let err_msg = e;
+    console.error(err_msg);
+    SpreadsheetApp.getUi().showModelessDialog(HtmlService.createHtmlOutput(err_msg), "Script error");
     
     return 0;
   }
   
-  // Iterate through the sheets rows and update them
+  // Iterate through the sheets rows, query the game info, and then update them
   try {
     for (var rnum = 0; rnum < sheet_data.length; rnum++) {
       
@@ -131,7 +132,9 @@ function update_SteamDB_Scores(force_try, check_price) {
         
         
         try {
+          ////////////////
           // Search query for games matching game_name
+          ////////////////
           var game_list = steamDB_search(game_name);
           query_count++;
           
@@ -152,12 +155,16 @@ function update_SteamDB_Scores(force_try, check_price) {
           // Logger.log("Found entries for " + game_name + ": " + game_list);
           
           var game_id           = "";
+          var url_link          = "";
           var game_rating       = "";
+          var game_rating_hyperlink = "";
           var game_review_count = "";
           var current_price     = "";
           var lowest_price      = "";
           
+          ////////////////
           // If matching games are found, get the rating and review_count
+          ////////////////
           game_list.forEach(function(game) {
                         
             // Query for game data
@@ -174,16 +181,18 @@ function update_SteamDB_Scores(force_try, check_price) {
               Logger.log("Couldn't find game data for: " + game);
             }
             else {
-              game_id         = game_data[0];
+              game_id    = game_data[0];
+              url_link   = URL_SteamDB_App + game_id + '/';
               if (game_data[2] != "") {
-               game_rating     = parseFloat(game_data[2]).toFixed(1); 
+                game_rating     = parseFloat(game_data[2]).toFixed(1);
+                game_rating_hyperlink = "=HYPERLINK(\"" + url_link + "\"," + game_rating + ")"; 
               }
               else {
                 game_rating = '';
               }
               game_review_count = game_data[3];
-              current_price   = game_data[4];
-              lowest_price    = game_data[5];
+              current_price     = game_data[4];
+              lowest_price      = game_data[5];
             }
             
             // Logger.log("Game '" + game_name + "' has " + game_review_count + " reviews averaging a score of " + game_rating + "\n");
@@ -193,7 +202,7 @@ function update_SteamDB_Scores(force_try, check_price) {
           // Update ratings/reviews in spreadsheet if not blank
           if (game_review_count != "") {
             if (game_rating != "") {
-              range.getCell(rnum + 1, col_SteamDB_Rating + 1).setValue(game_rating);
+              range.getCell(rnum + 1, col_SteamDB_Rating + 1).setValue(game_rating_hyperlink);
             }
             range.getCell(rnum + 1, col_SteamDB_ReviewCount + 1).setValue(game_review_count);
             
@@ -211,9 +220,9 @@ function update_SteamDB_Scores(force_try, check_price) {
           range.getCell(rnum + 1, col_SteamDB_UpdateTime + 1).setValue(new Date());
         }
         catch (e) {
-          var msg = function_name + " - Failed to get data for " + game_name + " - Error: " + e;
-          Logger.log(msg);
-          Browser.msgBox(msg);
+          var err_msg = function_name + " - Failed to get data for " + game_name + " - Error: " + e;
+          console.log(err_msg);
+          SpreadsheetApp.getUi().showModelessDialog(HtmlService.createHtmlOutput(err_msg), "Script error");
           
           return 0;
         }
@@ -224,8 +233,9 @@ function update_SteamDB_Scores(force_try, check_price) {
     }
   }
   catch(e) {
-    Logger.log(e);
-    Browser.msgBox(e);
+    let err_msg = e;
+    console.error(err_msg);
+    SpreadsheetApp.getUi().showModelessDialog(HtmlService.createHtmlOutput(err_msg), "Script error");
     
     return 0;
   }
@@ -283,9 +293,9 @@ function steamDB_search(game) {
     } while(responseCode != 200);
   }
   catch(e) {
-    let msg = function_name + " - couldn't fetch SteamDB search html for " + game + ": " + e;
-    Logger.log(msg);
-    Browser.msgBox(msg);
+    let err_msg = function_name + " - couldn't fetch SteamDB search html for " + game + ": " + e;
+    console.log(err_msg);
+    SpreadsheetApp.getUi().showModelessDialog(HtmlService.createHtmlOutput(err_msg), "Script error");
     
     return null;
   }
@@ -347,9 +357,9 @@ function steamDB_search(game) {
     }
   }
   catch(e) {
-    let msg = function_name + " - Unable to parse SteamDB search page for " + game + ": " + e;
-    Logger.log(msg);
-    Browser.msgBox(msg);
+    let err_msg = function_name + " - Unable to parse SteamDB search page for " + game + ": " + e;
+    console.log(err_msg);
+    SpreadsheetApp.getUi().showModelessDialog(HtmlService.createHtmlOutput(err_msg), "Script error");
     
     return null;
   }
@@ -414,9 +424,9 @@ function steamDB_game(app_ID, check_price) {
     } while(responseCode != 200);
   }
   catch(e) {
-    let msg = function_name + " - couldn't fetch SteamDB data for app_ID " + app_ID + ": " + e;
-    Logger.log(msg);
-    Browser.msgBox(msg);
+    let err_msg = function_name + " - couldn't fetch SteamDB data for app_ID " + app_ID + ": " + e;
+    console.log(err_msg);
+    SpreadsheetApp.getUi().showModelessDialog(HtmlService.createHtmlOutput(err_msg), "Script error");
     
     return null;
   }
@@ -535,9 +545,9 @@ function steamDB_game(app_ID, check_price) {
     }
   }
   catch(e) {
-    let msg = function_name + " - Unable to parse SteamDB app page for " + app_ID + ": " + e;
-    Logger.log(msg);
-    Browser.msgBox(msg);
+    let err_msg = function_name + " - Unable to parse SteamDB app page for " + app_ID + ": " + e;
+    console.log(err_msg);
+    SpreadsheetApp.getUi().showModelessDialog(HtmlService.createHtmlOutput(err_msg), "Script error");
     
     return null;
   }

@@ -160,3 +160,33 @@ function Test_ItchIo() {
   
   
 }
+
+
+/*
+
+[20-06-23 09:52:16:366 PDT] Starting MC_search()
+[20-06-23 09:52:16:369 PDT] https://www.metacritic.com/search/game/Hollow Knight/results
+[20-06-23 09:52:16:424 PDT] Hollow Knight, PC, https://www.metacritic.com/game/pc/hollow-knight, 2017
+[20-06-23 09:52:16:426 PDT] Hollow Knight, PS4, https://www.metacritic.com/game/playstation-4/hollow-knight, 2019
+[20-06-23 09:52:16:428 PDT] Hollow Knight, XONE, https://www.metacritic.com/game/xbox-one/hollow-knight, 2018
+[20-06-23 09:52:16:430 PDT] Ending MC_search() for Hollow Knight. Runtime = 0.1s
+[20-06-23 09:52:16:432 PDT] Starting MC_search()
+[20-06-23 09:52:16:433 PDT] https://www.metacritic.com/search/game/Yoku's Island Express/results
+[20-06-23 09:52:16:544 PDT] Yoku's Island Express, PS4, https://www.metacritic.com/game/playstation-4/yokus-island-express, 2018
+[20-06-23 09:52:16:547 PDT] Yoku's Island Express, XONE, https://www.metacritic.com/game/xbox-one/yokus-island-express, 2018
+[20-06-23 09:52:16:548 PDT] Yoku's Island Express, PC, https://www.metacritic.com/game/pc/yokus-island-express, 2018
+[20-06-23 09:52:16:553 PDT] Ending MC_search() for Yoku's Island Express. Runtime = 0.1s
+[20-06-23 09:52:16:554 PDT] Starting MC_search()
+[20-06-23 09:52:16:557 PDT] https://www.metacritic.com/search/game/Dark Souls III/results
+[20-06-23 09:52:16:676 PDT] Dark Souls III, PC, https://www.metacritic.com/game/pc/dark-souls-iii, 2016
+[20-06-23 09:52:16:679 PDT] Dark Souls III, XONE, https://www.metacritic.com/game/xbox-one/dark-souls-iii, 2016
+[20-06-23 09:52:16:685 PDT] Ending MC_search() for Dark Souls III. Runtime = 0.1s
+[20-06-23 09:52:16:687 PDT] Starting MC_search()
+[20-06-23 09:52:16:689 PDT] https://www.metacritic.com/search/game/GUACAMELEE! 2/results
+[20-06-23 09:52:16:768 PDT] Guacamelee! 2, PC, https://www.metacritic.com/game/pc/guacamelee!-2, 2018
+[20-06-23 09:52:16:770 PDT] Guacamelee! 2, Switch, https://www.metacritic.com/game/switch/guacamelee!-2, 2018
+[20-06-23 09:52:16:773 PDT] Guacamelee! 2, XONE, https://www.metacritic.com/game/xbox-one/guacamelee!-2, 2019
+[20-06-23 09:52:16:775 PDT] Ending MC_search() for GUACAMELEE! 2. Runtime = 0.1s
+
+
+*/

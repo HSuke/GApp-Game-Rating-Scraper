@@ -47,8 +47,8 @@ function update_MC_Scores(force_try) {
   }
   catch (e) {
     var err_msg = function_name + " - Couldn't open \"" + sheet.getName() + "\" sheet: " + e;
-    Logger.log(err_msg);
-    Browser.msgBox(err_msg);
+    console.error(err_msg);
+    SpreadsheetApp.getUi().showModelessDialog(HtmlService.createHtmlOutput(err_msg), "Script error");
     
     return 0;
   }
@@ -83,13 +83,14 @@ function update_MC_Scores(force_try) {
     });
   }
   catch(e) {
-    Logger.log(e);
-    Browser.msgBox(e);
+    let err_msg = e;
+    console.error(err_msg);
+    SpreadsheetApp.getUi().showModelessDialog(HtmlService.createHtmlOutput(err_msg), "Script error");
     
     return 0;
   }
   
-  // Iterate through the sheets rows and update them
+  // Iterate through the sheets rows, query the game info, and then update them
   try {
     for (var rnum = 0; rnum < sheet_data.length; rnum++) {
       
@@ -120,7 +121,9 @@ function update_MC_Scores(force_try) {
         
         
         try {
+          ////////////////
           // Search query for games matching game_name
+          ////////////////
           var game_list = MC_search(game_name);    // Returns: [[game_title, game_platform, game_link, game_year, "CScore", "UScore"]]
           query_count++;
           
@@ -151,11 +154,16 @@ function update_MC_Scores(force_try) {
           var cscore_str = [];
           var uscore_str = [];
           
+          var game_link = URL_MC_Search_prefix + game_name + URL_MC_Search_suffix;
+          
+          ////////////////
           // If matching games are found, get the rating and review_count
+          ////////////////
           game_list.forEach(function(item) {
             
             // Query for game data
             var scores = MC_game(item[0]+' [' + item[1]+']', item[2]);
+            
             // returns [cscore, uscore, cscore_count, uscore_count]
             
             if (debug_mode || info_mode) {
@@ -214,12 +222,17 @@ function update_MC_Scores(force_try) {
           
           // Update ratings/reviews in spreadsheet if not 0
           if ((total_uscore != 0) && (total_uscore_count != 0)) {
-            range.getCell(rnum + 1, col_MC_UserS_Combined + 1).setValue((total_uscore/total_uscore_count).toFixed(1));
+            var total_uscore_hyperlink = "=HYPERLINK(\"" + game_link + "\"," + (total_uscore/total_uscore_count).toFixed(1) + ")";
+            
+            range.getCell(rnum + 1, col_MC_UserS_Combined + 1).setValue(total_uscore_hyperlink);
             range.getCell(rnum + 1, col_MC_UserS + 1).setValue(uscore_str);
             range.getCell(rnum + 1, col_MC_Platforms + 1).setValue(all_platforms.join(', '));
           }
           if ((total_cscore != 0) && (total_cscore_count != 0)) {
-            range.getCell(rnum + 1, col_MC_CriticS_Combined + 1).setValue((total_cscore/total_cscore_count).toFixed(1));
+            //var total_cscore_hyperlink = "=HYPERLINK(\"" + game_link + "\"," + (total_cscore/total_cscore_count).toFixed(1) + ")";
+            var total_cscore_hyperlink = (total_cscore/total_cscore_count).toFixed(1);
+            
+            range.getCell(rnum + 1, col_MC_CriticS_Combined + 1).setValue(total_cscore_hyperlink);
             range.getCell(rnum + 1, col_MC_CriticS + 1).setValue(cscore_str);
           }
           
@@ -227,9 +240,9 @@ function update_MC_Scores(force_try) {
           range.getCell(rnum + 1, col_MC_UpdateTime + 1).setValue(new Date());
         }
         catch (e) {
-          var msg = function_name + " - Failed to get data for " + game_name + " - Error: " + e;
-          Logger.log(msg);
-          Browser.msgBox(msg);
+          var err_msg = function_name + " - Failed to get data for " + game_name + " - Error: " + e;
+          console.log(err_msg);
+          SpreadsheetApp.getUi().showModelessDialog(HtmlService.createHtmlOutput(err_msg), "Script error");
           
           return 0;
         }
@@ -240,8 +253,9 @@ function update_MC_Scores(force_try) {
     }
   }
   catch(e) {
-    Logger.log(e);
-    Browser.msgBox(e);
+    let err_msg = e;
+    console.error(err_msg);
+    SpreadsheetApp.getUi().showModelessDialog(HtmlService.createHtmlOutput(err_msg), "Script error");
     
     return 0;
   }
@@ -304,9 +318,9 @@ function MC_search(game_title_argument) {
     } while(responseCode != 200);
   }
   catch(e) {
-    let msg = function_name + " - couldn't fetch Metacritic search html for " + game_title_argument + ": " + e;
-    Logger.log(msg);
-    Browser.msgBox(msg);
+    let err_msg = function_name + " - couldn't fetch Metacritic search html for " + game_title_argument + ": " + e;
+    console.log(err_msg);
+    SpreadsheetApp.getUi().showModelessDialog(HtmlService.createHtmlOutput(err_msg), "Script error");
     
     return null;
   }
@@ -401,9 +415,9 @@ function MC_search(game_title_argument) {
     
   }
   catch(e) {
-    let msg = function_name + " - couldn't parse Metacritic search html for " + game_title_argument + ": " + e;
-    Logger.log(msg);
-    Browser.msgBox(msg);
+    let err_msg = function_name + " - couldn't parse Metacritic search html for " + game_title_argument + ": " + e;
+    console.log(err_msg);
+    SpreadsheetApp.getUi().showModelessDialog(HtmlService.createHtmlOutput(err_msg), "Script error");
     
     return null;
   }
@@ -447,23 +461,27 @@ function MC_game(game_name, game_link) {
       tries++;
       
       var responseCode = response.getResponseCode();
-      if (responseCode != 200) {
-        Logger.log("HTML status code for " + game + ": " + responseCode);
-        
-        // If exceeded max_fetch_attempts, quit
-        if (tries > max_fetch_attempts) {
-          return null;
+      if (responseCode != null) {
+        if (responseCode != 200) {
+          Logger.log("HTML status code for " + game + ": " + responseCode);
+          
+          // If exceeded max_fetch_attempts, quit
+          if (tries > max_fetch_attempts) {
+            return null;
+          }
+        }
+        else {
+          var html = response.getContentText().replace(/\s+/gmsi,' ');
         }
       }
-      else {
-        var html = response.getContentText().replace(/\s+/gmsi,' ');
-      }
-    } while(responseCode != 200);
+    } while((responseCode != 200) && (tries <= max_fetch_attempts));
   }
   catch(e) {
     let msg = function_name + " - couldn't fetch Metacritic data for " + game_name + ": " + e;
     Logger.log(msg);
-    Browser.msgBox(msg);
+    
+    // Metacritic site keeps giving 503 and 504 errors. Just fail silently.
+    // SpreadsheetApp.getUi().showModelessDialog(HtmlService.createHtmlOutput(err_msg), "Script error");
     
     return null;
   }
@@ -527,9 +545,9 @@ function MC_game(game_name, game_link) {
     
   }
   catch(e) {
-    let msg = function_name + " - Unable to parse Metacritic app page for " + game_name + ": " + e;
-    Logger.log(msg);
-    Browser.msgBox(msg);
+    let err_msg = function_name + " - Unable to parse Metacritic app page for " + game_name + ": " + e;
+    console.log(err_msg);
+    SpreadsheetApp.getUi().showModelessDialog(HtmlService.createHtmlOutput(err_msg), "Script error");
     
     return null;
   }

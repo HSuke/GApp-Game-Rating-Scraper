@@ -10,22 +10,24 @@
 ** Directions: In the spreadsheet, go to Menubar > Scripts Functions > Directions
 **
 ** Changelog: 
+**            2020-07-22 - console.log() updates
+**            2020-06-28 - Added hyperlinks to the game pages
 **            2020-06-28 - <max_fetch_attempts> set to 3. Fetches now try 3 times before failing
 **            2020-06-24 - Various fixes - Initial release
 **            2020-06-23 - Finished Metacritic.gs functions
 **            2020-06-20 - Finished SteamDB.gs functions
 **            2020-06-18 - Initial creation
 **
-** TO-DO:     Everything
+** TO-DO:     Hyperlinks for games
 **
 */
 
 ////////// GLOBAL VARIABLES - Start //////////
 
-var FileID_This_Sheet           = "<Insert Spreadsheet Document ID>";
-//var Sheet_Raw_Data              = "Itch.io MVs";
-//var Sheet_Raw_Data              = "MV Data";
-var Sheet_Raw_Data              = "Steam Sale MVs";
+const FileID_This_Sheet           = "1kyN5MDX0oRiktGBgX4mGeYH2kq0vR0oD67E2_qTHmrs";
+const Sheet_Raw_Data              = "Itch.io MVs";
+//const Sheet_Raw_Data              = "MV Data";
+//const Sheet_Raw_Data              = "Steam Sale MVs";
 
 var URL_SteamDB_Search        = "https://steamdb.info/search/?a=app&q="         // e.g. https://steamdb.info/search/?a=app&q=subnautica%20below%20
 var URL_SteamDB_App           = "https://steamdb.info/app/"                     // e.g. https://steamdb.info/app/848450/
@@ -98,3 +100,26 @@ function update_SteamSaleMVs_Page() {
     update_MC_Scores(0);
   }
 }
+
+// Update the "Itch.io Toma" page
+function update_ItchiIo_Toma_Page() {
+  Sheet_Raw_Data = "Itch.io Toma";
+  
+  // Run 3 times to attempt to get through the list
+  for (var i=0; i<4; i++) {
+    update_SteamDB_Scores();
+    update_MC_Scores();
+    update_ItchIo_Scores();
+  }
+}
+
+/*
+Useful Links:
+
+2 news items for Subnautica: https://api.steampowered.com/ISteamNews/GetNewsForApp/v2/?appid=848450&count=1
+https://store.steampowered.com/appreviews/848450
+https://steamdb.info/app/438310/
+
+https://www.reddit.com/r/itchioJusticeBundle/comments/h832x0/hey_guys_i_took_all_the_games_from_the_racial/
+
+*/

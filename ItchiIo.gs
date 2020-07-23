@@ -47,8 +47,8 @@ function update_ItchIo_Scores(force_try) {
   }
   catch (e) {
     var err_msg = function_name + " - Couldn't open \"" + sheet.getName() + "\" sheet: " + e;
-    Logger.log(err_msg);
-    Browser.msgBox(err_msg);
+    console.error(err_msg);
+    SpreadsheetApp.getUi().showModelessDialog(HtmlService.createHtmlOutput(err_msg), "Script error");
     
     return 0;
   }
@@ -80,13 +80,14 @@ function update_ItchIo_Scores(force_try) {
     });
   }
   catch(e) {
-    Logger.log(e);
-    Browser.msgBox(e);
+    let err_msg = e;
+    console.error(err_msg);
+    SpreadsheetApp.getUi().showModelessDialog(HtmlService.createHtmlOutput(err_msg), "Script error");
     
     return 0;
   }
   
-  // Iterate through the sheets rows and update them
+  // Iterate through the sheets rows, query the game info, and then update them
   try {
     for (var rnum = 0; rnum < sheet_data.length; rnum++) {
       
@@ -116,7 +117,9 @@ function update_ItchIo_Scores(force_try) {
         
         
         try {
+          ////////////////
           // Search query for games matching game_name
+          ////////////////
           var search_results = ItchIo_search(game_name);    // Returns: [[game_title, game_link]]
           query_count++;
           
@@ -140,8 +143,11 @@ function update_ItchIo_Scores(force_try) {
           
           var rating       = 0;
           var reviewCount  = 0;
+          var rating_hyperlink = "";
           
+          ////////////////
           // If matching games are found, get the rating and review_count
+          ////////////////
           var game_link = search_results[1];
           
           // Query for game data
@@ -149,6 +155,7 @@ function update_ItchIo_Scores(force_try) {
           // returns [rating, reviewCount];
           rating = scores[0];
           reviewCount = scores[1];
+          rating_hyperlink = "=HYPERLINK(\"" + game_link + "\"," + rating + ")"; 
           
           if (debug_mode || info_mode) {
             Logger.log("Score: " + scores);
@@ -161,7 +168,7 @@ function update_ItchIo_Scores(force_try) {
           
           // Update ratings/reviews in spreadsheet if not 0
           if ((rating != 0) && (reviewCount != 0)) {
-            range.getCell(rnum + 1, col_Itchio_Rating + 1).setValue(rating);
+            range.getCell(rnum + 1, col_Itchio_Rating + 1).setValue(rating_hyperlink);
             range.getCell(rnum + 1, col_Itchio_ReviewCount + 1).setValue(reviewCount);
           }
           
@@ -169,9 +176,9 @@ function update_ItchIo_Scores(force_try) {
           range.getCell(rnum + 1, col_Itchio_UpdateTime + 1).setValue(new Date());
         }
         catch (e) {
-          var msg = function_name + " - Failed to get data for " + game_name + " - Error: " + e;
-          Logger.log(msg);
-          Browser.msgBox(msg);
+          var err_msg = function_name + " - Failed to get data for " + game_name + " - Error: " + e;
+          console.error(err_msg);
+          SpreadsheetApp.getUi().showModelessDialog(HtmlService.createHtmlOutput(err_msg), "Script error");
           
           return 0;
         }
@@ -182,8 +189,9 @@ function update_ItchIo_Scores(force_try) {
     }
   }
   catch(e) {
-    Logger.log(e);
-    Browser.msgBox(e);
+    let err_msg = e;
+    console.error(err_msg);
+    SpreadsheetApp.getUi().showModelessDialog(HtmlService.createHtmlOutput(err_msg), "Script error");
     
     return 0;
   }
@@ -246,9 +254,9 @@ function ItchIo_search(game_title_argument) {
     } while(responseCode != 200);
   }
   catch(e) {
-    let msg = function_name + " - couldn't fetch Itch.io search html for " + game_title_argument + ": " + e;
-    Logger.log(msg);
-    Browser.msgBox(msg);
+    let err_msg = function_name + " - couldn't fetch Itch.io search html for " + game_title_argument + ": " + e;
+    console.log(err_msg);
+    SpreadsheetApp.getUi().showModelessDialog(HtmlService.createHtmlOutput(err_msg), "Script error");
     
     return null;
   }
@@ -316,9 +324,9 @@ function ItchIo_search(game_title_argument) {
     });
   }
   catch(e) {
-    let msg = function_name + " - couldn't parse Itch.io search html for " + game_title_argument + ": " + e;
-    Logger.log(msg);
-    Browser.msgBox(msg);
+    let err_msg = function_name + " - couldn't parse Itch.io search html for " + game_title_argument + ": " + e;
+    console.log(err_msg);
+    SpreadsheetApp.getUi().showModelessDialog(HtmlService.createHtmlOutput(err_msg), "Script error");
     
     return null;
   }
@@ -376,9 +384,9 @@ function ItchIo_game(game_name, game_link) {
     } while(responseCode != 200);
   }
   catch(e) {
-    let msg = function_name + " - couldn't fetch Itch.io data for " + game_name + ": " + e;
-    Logger.log(msg);
-    Browser.msgBox(msg);
+    let err_msg = function_name + " - couldn't fetch Itch.io data for " + game_name + ": " + e;
+    console.log(err_msg);
+    SpreadsheetApp.getUi().showModelessDialog(HtmlService.createHtmlOutput(err_msg), "Script error");
     
     return null;
   }
@@ -414,9 +422,9 @@ function ItchIo_game(game_name, game_link) {
     }
   }
   catch(e) {
-    let msg = function_name + " - Unable to parse Itch.io app page for " + game_name + ": " + e;
-    Logger.log(msg);
-    Browser.msgBox(msg);
+    let err_msg = function_name + " - Unable to parse Itch.io app page for " + game_name + ": " + e;
+    console.log(err_msg);
+    SpreadsheetApp.getUi().showModelessDialog(HtmlService.createHtmlOutput(err_msg), "Script error");
     
     return null;
   }
