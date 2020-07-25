@@ -190,3 +190,11 @@ function Test_ItchIo() {
 
 
 */
+
+function time_test() {
+  var time1 = new Date();
+  Logger.log(time1);
+  Logger.log(time1.toUTCString());
+  Logger.log(time1.toDateString());
+  Logger.log(time1.toISOString());
+}

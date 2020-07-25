@@ -223,8 +223,14 @@ function update_MC_Scores(force_try) {
           // Update ratings/reviews in spreadsheet if not 0
           if ((total_uscore != 0) && (total_uscore_count != 0)) {
             var total_uscore_hyperlink = "=HYPERLINK(\"" + game_link + "\"," + (total_uscore/total_uscore_count).toFixed(1) + ")";
+            var date_hyperlink = "=HYPERLINK(\"" + game_link + "\",\"" + new Date().toDateString() + "\")";
             
-            range.getCell(rnum + 1, col_MC_UserS_Combined + 1).setValue(total_uscore_hyperlink);
+            if (include_score_hyperlinks) {
+              range.getCell(rnum + 1, col_MC_UserS_Combined + 1).setValue(total_uscore_hyperlink);
+            }
+            else {
+              range.getCell(rnum + 1, col_MC_UserS_Combined + 1).setValue((total_uscore/total_uscore_count).toFixed(1));
+            }
             range.getCell(rnum + 1, col_MC_UserS + 1).setValue(uscore_str);
             range.getCell(rnum + 1, col_MC_Platforms + 1).setValue(all_platforms.join(', '));
           }
@@ -237,7 +243,12 @@ function update_MC_Scores(force_try) {
           }
           
           // Update time
-          range.getCell(rnum + 1, col_MC_UpdateTime + 1).setValue(new Date());
+          if (include_date_hyperlinks) {
+            range.getCell(rnum + 1, col_MC_UpdateTime + 1).setValue(date_hyperlink);
+          }
+          else {
+            range.getCell(rnum + 1, col_MC_UpdateTime + 1).setValue(new Date());
+          }
         }
         catch (e) {
           var err_msg = function_name + " - Failed to get data for " + game_name + " - Error: " + e;

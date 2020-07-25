@@ -202,7 +202,12 @@ function update_SteamDB_Scores(force_try, check_price) {
           // Update ratings/reviews in spreadsheet if not blank
           if (game_review_count != "") {
             if (game_rating != "") {
-              range.getCell(rnum + 1, col_SteamDB_Rating + 1).setValue(game_rating_hyperlink);
+              if (include_score_hyperlinks) {
+                range.getCell(rnum + 1, col_SteamDB_Rating + 1).setValue(game_rating_hyperlink);
+              }
+              else {
+                range.getCell(rnum + 1, col_SteamDB_Rating + 1).setValue(game_rating);
+              }
             }
             range.getCell(rnum + 1, col_SteamDB_ReviewCount + 1).setValue(game_review_count);
             
@@ -217,7 +222,13 @@ function update_SteamDB_Scores(force_try, check_price) {
           }
           
           // Update time
-          range.getCell(rnum + 1, col_SteamDB_UpdateTime + 1).setValue(new Date());
+          if (include_date_hyperlinks) {
+            var date_hyperlink = "=HYPERLINK(\"" + url_link + "\",\"" + (new Date().toDateString()) + "\")"; 
+            range.getCell(rnum + 1, col_SteamDB_UpdateTime + 1).setValue(date_hyperlink);
+          }
+          else {
+            range.getCell(rnum + 1, col_SteamDB_UpdateTime + 1).setValue(new Date());
+          }
         }
         catch (e) {
           var err_msg = function_name + " - Failed to get data for " + game_name + " - Error: " + e;

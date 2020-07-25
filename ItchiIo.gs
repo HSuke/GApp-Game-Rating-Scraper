@@ -144,6 +144,7 @@ function update_ItchIo_Scores(force_try) {
           var rating       = 0;
           var reviewCount  = 0;
           var rating_hyperlink = "";
+          var date_hyperlink   = "";
           
           ////////////////
           // If matching games are found, get the rating and review_count
@@ -156,6 +157,7 @@ function update_ItchIo_Scores(force_try) {
           rating = scores[0];
           reviewCount = scores[1];
           rating_hyperlink = "=HYPERLINK(\"" + game_link + "\"," + rating + ")"; 
+          date_hyperlink   = "=HYPERLINK(\"" + game_link + "\",\"" + new Date().toDateString() + "\")";
           
           if (debug_mode || info_mode) {
             Logger.log("Score: " + scores);
@@ -168,12 +170,22 @@ function update_ItchIo_Scores(force_try) {
           
           // Update ratings/reviews in spreadsheet if not 0
           if ((rating != 0) && (reviewCount != 0)) {
-            range.getCell(rnum + 1, col_Itchio_Rating + 1).setValue(rating_hyperlink);
+            if (include_score_hyperlinks) {
+              range.getCell(rnum + 1, col_Itchio_Rating + 1).setValue(rating_hyperlink);
+            }
+            else {
+              range.getCell(rnum + 1, col_Itchio_Rating + 1).setValue(rating);
+            }
             range.getCell(rnum + 1, col_Itchio_ReviewCount + 1).setValue(reviewCount);
           }
           
           // Update time
-          range.getCell(rnum + 1, col_Itchio_UpdateTime + 1).setValue(new Date());
+          if (include_date_hyperlinks) {
+            range.getCell(rnum + 1, col_Itchio_UpdateTime + 1).setValue(date_hyperlink);
+          }
+          else {
+            range.getCell(rnum + 1, col_Itchio_UpdateTime + 1).setValue(new Date());
+          }
         }
         catch (e) {
           var err_msg = function_name + " - Failed to get data for " + game_name + " - Error: " + e;
