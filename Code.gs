@@ -45,7 +45,7 @@ var include_score_hyperlinks  = 0;        // Boolean for whether hyperlinks to t
 var include_date_hyperlinks   = 0;        // Boolean for whether hyperlinks to the game pages will added to each timestamp cell
 
 var info_mode                 = 0;        // Debug mode produces some Logger logs (slightly slower)
-var debug_mode                = 1;        // Debug mode produces even Logger more logs (even slower)
+var debug_mode                = 0;        // Debug mode produces even Logger more logs (even slower)
 
 // Column headers in <Sheet_Raw_Data>
 var Header_Game_Title           = "Game Title"
